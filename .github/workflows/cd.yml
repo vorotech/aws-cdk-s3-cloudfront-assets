@@ -34,7 +34,7 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
 
       - name: Get changed files
-        uses: vorotech/get-changed-files@v1
+        uses: jitterbit/get-changed-files@v1
         if: github.event_name == 'push'
         id: files
 
