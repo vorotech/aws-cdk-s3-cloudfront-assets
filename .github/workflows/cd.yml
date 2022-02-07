@@ -1,0 +1,53 @@
+
+---
+name: Continuous Deployment
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+
+env:
+  AWS_REGION: eu-west-1
+
+jobs:
+
+  upload-s3:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Confiugre AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload (from main repo only)
+        if: github.repository_owner == 'vorotech'
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --follow-symlinks --delete --exclude '*' --include 'heroes/*' --size-only
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+
+      - name: Get changed files
+        uses: jitterbit/get-changed-files@v1
+        if: github.event_name == 'push'
+        id: files
+
+      - name: Filter files to invalidate
+        run: |
+          echo "::set-output name=paths::$(echo ${{ steps.files.outputs.added_modified }} | tr ' ' '\n' | grep -E 'heroes/' | awk '{print "/"$1}' | tr '\n' ' ')"
+        if: github.event_name == 'push'
+        id: filter
+    
+      - name: Invalidate CloudFront
+        if: github.repository_owner == 'vorotech' && github.event_name == 'push' && steps.filter.outputs.paths != ''
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          PATHS: ${{ steps.filter.outputs.paths }}
+          DISTRIBUTION: ${{ secrets.AWS_DISTRIBUTION_ID }}
