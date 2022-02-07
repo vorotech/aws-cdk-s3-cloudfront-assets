@@ -36,4 +36,4 @@ Next, configure the following GitHub secrets:
 Finally, make a Pull Request and add/edit image(s) to the `assets/heroes` folder.
 
 After Pull Request will be merged, the GitHub `cd` workflow action should 
-sync created/updated files and invalidated CDN.
+sync created/updated files and invalidated CDN (for changed files only).
