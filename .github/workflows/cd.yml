@@ -29,7 +29,7 @@ jobs:
       - name: Deploy to S3
         if: github.repository_owner == 'vorotech'
         shell: bash
-        run: aws s3 sync ./assets/ s3://$AWS_S3_BUCKET  --follow-symlinks --delete --exclude '*' --include 'assets/*' --size-only
+        run: aws s3 sync . s3://$AWS_S3_BUCKET  --follow-symlinks --delete --exclude '*' --include 'assets/*' --size-only
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
 
