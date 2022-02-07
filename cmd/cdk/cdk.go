@@ -29,9 +29,11 @@ func NewOidcProviderStack(scope constructs.Construct, id string, props *awscdk.S
 	stack := &OidcProviderStack{Stack: awscdk.NewStack(scope, &id, props)}
 
 	stack.OIDCProvider = awsiam.NewCfnOIDCProvider(stack.Stack, jsii.String("GitHubOIDCProvider"), &awsiam.CfnOIDCProviderProps{
-		Url:            jsii.String("https://token.actions.githubusercontent.com"),
-		ClientIdList:   jsii.Strings("sts.amazonaws.com"),
-		ThumbprintList: jsii.Strings("a031c46782e6e6c662c2c87c76da9aa62ccabd8e"),
+		Url:          jsii.String("https://token.actions.githubusercontent.com"),
+		ClientIdList: jsii.Strings("sts.amazonaws.com"),
+
+		// https://github.blog/changelog/2022-01-13-github-actions-update-on-oidc-based-deployments-to-aws/
+		ThumbprintList: jsii.Strings("6938fd4d98bab03faadb97b34396831e3780aea1"),
 	})
 
 	return stack

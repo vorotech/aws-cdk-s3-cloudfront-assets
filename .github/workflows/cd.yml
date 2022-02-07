@@ -26,16 +26,15 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Upload (from main repo only)
+      - name: Deploy to S3
         if: github.repository_owner == 'vorotech'
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --follow-symlinks --delete --exclude '*' --include 'heroes/*' --size-only
+        shell: bash
+        run: aws s3 sync ./assets/ s3://$AWS_S3_BUCKET  --follow-symlinks --delete --exclude '*' --include 'heroes/*' --size-only
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
 
       - name: Get changed files
-        uses: jitterbit/get-changed-files@v1
+        uses: vorotech/get-changed-files@v1
         if: github.event_name == 'push'
         id: files
 
